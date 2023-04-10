@@ -14,8 +14,6 @@ namespace ContaCorrente
         public double limite;
         public string[] movimentacao;
 
-
-
         public ContaCorrente(int numero, double saldo, bool isSpecial, double limite, string[] movimentacao)
         {
             this.numero = numero;
