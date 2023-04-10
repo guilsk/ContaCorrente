@@ -12,9 +12,9 @@ namespace ContaCorrente
         public double saldo;
         public bool isSpecial;
         public double limite;
-        public string[] movimentacao;
+        public Movimentacao[] movimentacao;
 
-        public ContaCorrente(int numero, double saldo, bool isSpecial, double limite, string[] movimentacao)
+        public ContaCorrente(int numero, double saldo, bool isSpecial, double limite, Movimentacao[] movimentacao)
         {
             this.numero = numero;
             this.saldo = saldo;
@@ -29,12 +29,27 @@ namespace ContaCorrente
 
         public void Sacar(double valor)
         {
-            if(valor <= this.limite + this.saldo) this.saldo -= valor;
+            if (valor <= this.limite + this.saldo)
+            {
+                this.saldo -= valor;
+
+                Movimentacao m = new Movimentacao();
+                m.valor = valor;
+                m.tipo = "Débito";
+                m.descricao = "Débito de "+valor+" reais";
+                this.movimentacao[PegaPosicaoVazia()] = m;
+            }
+            
         }
 
         public void Depositar(double valor)
         {
             this.saldo += valor;
+            Movimentacao m = new Movimentacao();
+            m.valor = valor;
+            m.tipo = "Crédito";
+            m.descricao = "Crédito de " + valor + " reais";
+            this.movimentacao[PegaPosicaoVazia()] = m;
         }
 
         public void ExibirSaldo()
@@ -48,19 +63,31 @@ namespace ContaCorrente
             Console.WriteLine("Saldo: " + this.saldo);
             Console.WriteLine("Conta Especial: " + this.isSpecial);
             Console.WriteLine("Limite: " + this.limite);
-            Console.WriteLine("Movimentação:");
-            for (int i = 0; i < this.movimentacao.Length; i++){
-                if(i % 2 == 0)
-                    movimentacao[i] = "credito";
-                else
-                    movimentacao[i] = "débito";
-                Console.WriteLine("\t" + this.movimentacao[i]);
+            Console.WriteLine("Movimentação: ");
+            for (int i = 0; i < this.movimentacao.Length; i++)
+            {
+                if (this.movimentacao[i] != null)
+                {
+                    Console.Write(" -> ");
+                    this.movimentacao[i].Informacoes(); 
+                }
             }
         }
 
         public void TransferirPara(ContaCorrente c, double valor)
         {
-            c.saldo += valor;
+            Sacar(valor);
+            c.Depositar(valor);
+        }
+
+        public int PegaPosicaoVazia()
+        {
+            int n = 0;
+            for (int i = 0; i < this.movimentacao.Length; i++)
+                if (this.movimentacao[i] == null)
+                    n = i;
+            
+            return n;
         }
     }
 }
